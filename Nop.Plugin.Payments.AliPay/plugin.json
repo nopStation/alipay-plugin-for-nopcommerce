@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Payment methods",
+  "FriendlyName": "AliPay",
+  "SystemName": "Payments.AliPay",
+  "Version": "1.32",
+  "SupportedVersions": [ "4.40" ],
+  "Author": "nopCommerce team, Nop-Station Team",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Payments.AliPay.dll",
+  "Description": "This payment module allows you to integrate with AliPay, payment module"
+}
