@@ -38,6 +38,7 @@ namespace Nop.Plugin.Payments.AliPay
         private readonly IStoreContext _storeContext;
         private readonly AliPayPaymentSettings _aliPayPaymentSettings;
         private readonly ILocalizationService _localizationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         #endregion
 
@@ -48,13 +49,15 @@ namespace Nop.Plugin.Payments.AliPay
             IWebHelper webHelper,
             IStoreContext storeContext,
             AliPayPaymentSettings aliPayPaymentSettings,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService, 
+            IHttpContextAccessor httpContextAccessor)
         {
             this._settingService = settingService;
             this._webHelper = webHelper;
             this._storeContext = storeContext;
             this._aliPayPaymentSettings = aliPayPaymentSettings;
             this._localizationService = localizationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -131,7 +134,7 @@ namespace Nop.Plugin.Payments.AliPay
             Array.Sort(para, StringComparer.InvariantCulture);
             var sign = GetMD5(para.Aggregate((all, curent) => all + "&" + curent) + key);
 
-            var post = new RemotePost
+            var post = new RemotePost(_httpContextAccessor,_webHelper)
             {
                 FormName = "alipaysubmit",
                 Url = "https://www.alipay.com/cooperate/gateway.do?_input_charset=utf-8",
