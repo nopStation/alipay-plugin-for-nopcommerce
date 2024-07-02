@@ -8,27 +8,24 @@ namespace Nop.Plugin.Payments.AliPay
     {
         #region Methods
 
-        public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
+        public void RegisterRoutes(IEndpointRouteBuilder routes)
         {
-            endpointRouteBuilder.MapControllerRoute("Plugin.Payments.AliPay.Notify", "Plugins/PaymentAliPay/Notify",
-                 new { controller = "PaymentAliPay", action = "Notify" });
+            routes.MapControllerRoute(
+                name: "Plugin.Payments.AliPay.Notify",
+                pattern: "Plugins/PaymentAliPay/Notify",
+                defaults: new { controller = "PaymentAliPay", action = "Notify" });
 
-            //Notify
-            endpointRouteBuilder.MapControllerRoute("Plugin.Payments.AliPay.Return", "Plugins/PaymentAliPay/Return",
-                 new { controller = "PaymentAliPay", action = "Return" });
+            routes.MapControllerRoute(
+                name: "Plugin.Payments.AliPay.Return",
+                pattern: "Plugins/PaymentAliPay/Return",
+                defaults: new { controller = "PaymentAliPay", action = "Return" });
         }
 
         #endregion
 
         #region Properties
 
-        public int Priority
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public int Priority => 0;
 
         #endregion
     }

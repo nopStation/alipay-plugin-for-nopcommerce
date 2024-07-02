@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +40,9 @@ namespace Nop.Plugin.Payments.AliPay.Controllers
 
         #region Ctor
 
-        public PaymentAliPayController(ISettingService settingService, 
-            IOrderService orderService, 
-            IOrderProcessingService orderProcessingService, 
+        public PaymentAliPayController(ISettingService settingService,
+            IOrderService orderService,
+            IOrderProcessingService orderProcessingService,
             ILogger logger,
             INotificationService notificationService,
             ILocalizationService localizationService,
@@ -102,8 +103,8 @@ namespace Nop.Plugin.Payments.AliPay.Controllers
 
             return RedirectToAction("Configure");
         }
-        
-        public async Task<IActionResult> Notify(IFormCollection form) 
+
+        public async Task<IActionResult> Notify(IFormCollection form)
         {
             var processor = await _paymentPluginManager.LoadPluginBySystemNameAsync("Payments.AliPay") as AliPayPaymentProcessor;
 
@@ -196,7 +197,7 @@ namespace Nop.Plugin.Payments.AliPay.Controllers
                 }
 
                 data = Encoding.UTF8.GetBytes("success");
-                
+
             }
             else
             {
@@ -206,7 +207,7 @@ namespace Nop.Plugin.Payments.AliPay.Controllers
 
                 await _logger.ErrorAsync(logStr);
             }
-            
+
             Response.Body.Write(data, 0, data.Length);
             return Content("");
         }

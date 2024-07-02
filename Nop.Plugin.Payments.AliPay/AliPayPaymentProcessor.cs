@@ -14,6 +14,8 @@ using Nop.Services.Localization;
 using Nop.Services.Payments;
 using Nop.Web.Framework;
 using System.Threading.Tasks;
+using Nop.Plugin.Payments.AliPay.Components;
+using Nop.Services.Orders;
 
 namespace Nop.Plugin.Payments.AliPay
 {
@@ -38,6 +40,8 @@ namespace Nop.Plugin.Payments.AliPay
         private readonly IStoreContext _storeContext;
         private readonly AliPayPaymentSettings _aliPayPaymentSettings;
         private readonly ILocalizationService _localizationService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         #endregion
 
@@ -48,13 +52,17 @@ namespace Nop.Plugin.Payments.AliPay
             IWebHelper webHelper,
             IStoreContext storeContext,
             AliPayPaymentSettings aliPayPaymentSettings,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IOrderTotalCalculationService orderTotalCalculationService,
+            IHttpContextAccessor httpContextAccessor = null)
         {
-            this._settingService = settingService;
-            this._webHelper = webHelper;
-            this._storeContext = storeContext;
-            this._aliPayPaymentSettings = aliPayPaymentSettings;
-            this._localizationService = localizationService;
+            _settingService = settingService;
+            _webHelper = webHelper;
+            _storeContext = storeContext;
+            _aliPayPaymentSettings = aliPayPaymentSettings;
+            _localizationService = localizationService;
+            _orderTotalCalculationService = orderTotalCalculationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -68,16 +76,19 @@ namespace Nop.Plugin.Payments.AliPay
         /// <returns>MD5 hash sum</returns>
         internal string GetMD5(string input)
         {
-            var md5 = new MD5CryptoServiceProvider();
-            var t = md5.ComputeHash(Encoding.GetEncoding(InputCharset).GetBytes(input));
-            var sb = new StringBuilder(32);
-
-            foreach (var b in t)
+            using (var md5 = MD5.Create())
             {
-                sb.AppendFormat("{0:X}", b);
-            }
+                byte[] inputBytes = Encoding.GetEncoding(InputCharset).GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
 
-            return sb.ToString();
+                StringBuilder sb = new();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+
+                return sb.ToString();
+            }
         }
 
         #endregion
@@ -131,11 +142,11 @@ namespace Nop.Plugin.Payments.AliPay
             Array.Sort(para, StringComparer.InvariantCulture);
             var sign = GetMD5(para.Aggregate((all, curent) => all + "&" + curent) + key);
 
-            var post = new RemotePost
+            var post = new RemotePost(_httpContextAccessor, _webHelper)
             {
                 FormName = "alipaysubmit",
                 Url = "https://www.alipay.com/cooperate/gateway.do?_input_charset=utf-8",
-                Method = "POST"
+                Method = "POST",
             };
 
             post.Add("service", Service);
@@ -289,9 +300,9 @@ namespace Nop.Plugin.Payments.AliPay
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentAliPay/Configure";
         }
 
-        public string GetPublicViewComponentName()
+        public Type GetPublicViewComponent()
         {
-            return "PaymentAliPay";
+            return typeof(PaymentAliPayViewComponent);
         }
 
         public override async Task InstallAsync()
@@ -346,76 +357,37 @@ namespace Nop.Plugin.Payments.AliPay
         /// <summary>
         /// Gets a value indicating whether capture is supported
         /// </summary>
-        public bool SupportCapture
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportCapture => false;
 
         /// <summary>
         /// Gets a value indicating whether partial refund is supported
         /// </summary>
-        public bool SupportPartiallyRefund
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportPartiallyRefund => false;
 
         /// <summary>
         /// Gets a value indicating whether refund is supported
         /// </summary>
-        public bool SupportRefund
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportRefund => false;
 
         /// <summary>
         /// Gets a value indicating whether void is supported
         /// </summary>
-        public bool SupportVoid
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportVoid => false;
 
         /// <summary>
         /// Gets a recurring payment type of payment method
         /// </summary>
-        public RecurringPaymentType RecurringPaymentType
-        {
-            get
-            {
-                return RecurringPaymentType.NotSupported;
-            }
-        }
+        public RecurringPaymentType RecurringPaymentType => RecurringPaymentType.NotSupported;
 
         /// <summary>
         /// Gets a payment method type
         /// </summary>
-        public PaymentMethodType PaymentMethodType
-        {
-            get
-            {
-                return PaymentMethodType.Redirection;
-            }
-        }
+        public PaymentMethodType PaymentMethodType => PaymentMethodType.Redirection;
 
         /// <summary>
         /// Gets a value indicating whether we should display a payment information page for this plugin
         /// </summary>
-        public bool SkipPaymentInfo
-        {
-            get { return false; }
-        }
+        public bool SkipPaymentInfo => false;
 
         /// <summary>
         /// Gets a payment method description that will be displayed on checkout pages in the public store
