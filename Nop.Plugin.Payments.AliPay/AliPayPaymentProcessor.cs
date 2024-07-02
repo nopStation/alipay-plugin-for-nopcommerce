@@ -76,19 +76,16 @@ namespace Nop.Plugin.Payments.AliPay
         /// <returns>MD5 hash sum</returns>
         internal string GetMD5(string input)
         {
-            using (var md5 = MD5.Create())
+            var md5 = new MD5CryptoServiceProvider();
+            var t = md5.ComputeHash(Encoding.GetEncoding(InputCharset).GetBytes(input));
+            var sb = new StringBuilder(32);
+
+            foreach (var b in t)
             {
-                byte[] inputBytes = Encoding.GetEncoding(InputCharset).GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                StringBuilder sb = new();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-
-                return sb.ToString();
+                sb.AppendFormat("{0:X}", b);
             }
+
+            return sb.ToString();
         }
 
         #endregion
