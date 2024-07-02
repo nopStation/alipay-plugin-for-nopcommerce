@@ -300,10 +300,10 @@ namespace Nop.Plugin.Payments.AliPay
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentAliPay/Configure";
         }
 
-        //public string GetPublicViewComponentName()
-        //{
-        //    return "PaymentAliPay";
-        //}
+        public Type GetPublicViewComponent()
+        {
+            return typeof(PaymentAliPayViewComponent);
+        }
 
         public override async Task InstallAsync()
         {
@@ -395,12 +395,6 @@ namespace Nop.Plugin.Payments.AliPay
         public async Task<string> GetPaymentMethodDescriptionAsync()
         {
             return await _localizationService.GetResourceAsync("Plugins.Payments.AliPay.PaymentMethodDescription");
-        }
-
-        public Type GetPublicViewComponent()
-        {
-            return typeof(PaymentAliPayViewComponent);
-            //throw new NotImplementedException();
         }
 
         #endregion
