@@ -1,14 +1,13 @@
-﻿@{
+﻿@model Nop.Plugin.Payments.AliPay.Models.ConfigurationModel
+@{
     Layout = "_ConfigurePlugin";
 }
-
-@model ConfigurationModel
-@using Nop.Plugin.Payments.AliPay.Models;
 
 <form asp-controller="PaymentAliPay" asp-action="Configure" method="post">
     <div class="cards-group">
         <div class="card card-default">
             <div class="card-body">
+
                 <div class="form-group row">
                     <div class="col-md-3">
                         <nop-label asp-for="SellerEmail" />
@@ -18,6 +17,7 @@
                         <span asp-validation-for="SellerEmail"></span>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <div class="col-md-3">
                         <nop-label asp-for="Key" />
@@ -27,6 +27,7 @@
                         <span asp-validation-for="Key"></span>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <div class="col-md-3">
                         <nop-label asp-for="Partner" />
@@ -36,6 +37,7 @@
                         <span asp-validation-for="Partner"></span>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <div class="col-md-3">
                         <nop-label asp-for="AdditionalFee" />
@@ -45,9 +47,10 @@
                         <span asp-validation-for="AdditionalFee"></span>
                     </div>
                 </div>
+
                 <div class="form-group row">
-                    <div class="col-md-9 col-md-offset-3">
-                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    <div class="col-md-9 offset-md-3">
+                        <button type="submit" name="save" class="btn btn-primary">@T("Admin.Common.Save")</button>
                     </div>
                 </div>
             </div>
